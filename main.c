@@ -2,7 +2,7 @@
 #include <math.h>
 
 double velocity(double height);
-void resetVelocity(void)
+void resetVelocity(double velocityArray[]);
 
 double gravity = 9.81;
 double step = 0.5;
@@ -17,7 +17,7 @@ int main(void)
 
 	while(1)
 	{
-	    resetVelocity();
+	    resetVelocity(velocityArray);
 
         for(i=0; i<10; i++)
         {
@@ -30,7 +30,7 @@ int main(void)
 
             if(i == 9)
             {
-                resetVelocity();
+                resetVelocity(velocityArray);
                 i = 0;
             }
         }
@@ -44,7 +44,7 @@ double velocity(double height)
 }
 
 //Simple function that resets velocity memory.
-void resetVelocity(void)
+void resetVelocity(double velocityArray[])
 {
     for(i = 0; i<10; i++)
         velocityArray[i] = 0;

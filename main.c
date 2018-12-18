@@ -13,7 +13,20 @@ int main(void)
     double testHeight = 5.0;
     double velocityArray[10];
 
+    P1DIR |= BIT0;
+    P1OUT &= ~BIT0;
+
+    TA0CCTL0 = CCIE;
+    TA0CTL = TASSEL_1 | ID_2 | MC_1 | TACLR;
+    TA0CCR0 = 0x8000;
+    TA0R = 0;
+
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
+
+	while(1)
+	{
+	    ;
+	}
 
 	while(1)
 	{
@@ -49,3 +62,9 @@ void resetVelocity(double velocityArray[])
     for(i = 0; i<10; i++)
         velocityArray[i] = 0;
 }
+
+#pragma vector = TIMER0_A0_VECTOR;
+__interrupt void Timer_ISR(void)
+  {
+    P1OUT ^= BIT0;
+  }

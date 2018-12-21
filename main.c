@@ -1,5 +1,7 @@
-#include <msp430.h> 
+#include <msp430.h>
 #include <math.h>
+
+#define LED1 BIT0
 
 double velocity(double height);
 void resetVelocity(double velocityArray[]);
@@ -10,14 +12,23 @@ unsigned int i;
 
 int main(void)
 {
-    double testHeight = 5.0;
+    double testHeight;
     double velocityArray[10];
 
-	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
+    P1DIR |= LED1;
 
-	while(1)
-	{
-	    resetVelocity(velocityArray);
+    TA0CCTL0 = CCIE;
+    TA0CTL = TASSEL_1 | ID_1 | MC_1 | TACLR;
+    TA0CCR0 = 0x8000;
+    TA0R = 0;
+
+    WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
+    __bis_SR_register(GIE);     // Enable global interrupts.
+
+    while(1)
+    {
+        testHeight = 5.0;
+        resetVelocity(velocityArray);
 
         for(i=0; i<10; i++)
         {
@@ -27,14 +38,8 @@ int main(void)
                 velocityArray[i] = 0;
             else
                 velocityArray[i] = velocity(testHeight);
-
-            if(i == 9)
-            {
-                resetVelocity(velocityArray);
-                i = 0;
-            }
         }
-	}
+    }
 }
 
 //Velocity of water flow from IV.
@@ -49,3 +54,9 @@ void resetVelocity(double velocityArray[])
     for(i = 0; i<10; i++)
         velocityArray[i] = 0;
 }
+
+#pragma vector = TIMER0_A0_VECTOR;
+__interrupt void Timer(void)
+  {
+    P1OUT ^= LED1;
+  }
